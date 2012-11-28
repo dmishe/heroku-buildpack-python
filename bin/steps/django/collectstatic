@@ -10,10 +10,10 @@ indent() {
 
 
 # Check if collectstatic is configured properly.
+python $MANAGE_FILE collectstatic --dry-run --noinput &> /dev/null && RUN_COLLECTSTATIC=true
 
-python $MANAGE_FILE collectstatic --dry-run --noinput && RUN_COLLECTSTATIC=true
 # Compile assets if collectstatic appears to be kosher.
-if [ $? -eq 0 ]; then
+if [ "$RUN_COLLECTSTATIC" ]; then
 
     echo "-----> Collecting static files"
     python $MANAGE_FILE collectstatic --noinput  2>&1 | sed '/^Copying/d;/^$/d;/^ /d' | indent
@@ -25,4 +25,3 @@ if [ $? -eq 0 ]; then
 fi
 
 echo
-
