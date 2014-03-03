@@ -9,26 +9,24 @@ indent() {
 MANAGE_FILE=$(find . -maxdepth 3 -type f -name 'manage.py' | head -1)
 MANAGE_FILE=${MANAGE_FILE:2}
 
-if [ ! "$DISABLE_COLLECTSTATIC" ]; then
-    set +e
 
-    # Check if collectstatic is configured properly.
-    python $MANAGE_FILE collectstatic --dry-run --noinput &> /dev/null && RUN_COLLECTSTATIC=true
+set +e
 
-    # Compile assets if collectstatic appears to be kosher.
-    if [ "$RUN_COLLECTSTATIC" ]; then
+# Check if collectstatic is configured properly.
+python $MANAGE_FILE collectstatic --dry-run --noinput &> /dev/null && RUN_COLLECTSTATIC=true
 
-        echo "-----> Collecting static files"
-        python $MANAGE_FILE collectstatic --noinput  2>&1 | sed '/^Copying/d;/^$/d;/^ /d' | indent
+# Compile assets if collectstatic appears to be kosher.
+if [ "$RUN_COLLECTSTATIC" ]; then
 
-        [ $? -ne 0 ] && {
-            echo " !     Error running manage.py collectstatic. More info:"
-            echo "       http://devcenter.heroku.com/articles/django-assets"
-        }
-    fi
+    echo "-----> Collecting static files"
+    python $MANAGE_FILE collectstatic --noinput  2>&1 | sed '/^Copying/d;/^$/d;/^ /d' | indent
 
-    echo
-
-
+    [ $? -ne 0 ] && {
+        echo " !     Error running manage.py collectstatic. More info:"
+        echo "       http://devcenter.heroku.com/articles/django-assets"
+    }
 fi
+
+echo
+
 
